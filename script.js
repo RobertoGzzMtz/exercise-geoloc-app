@@ -7,11 +7,24 @@ class Workout {
 
   constructor(coords, distance, duration) {
     this.coords = coords;
-    this.distance = distance; 
-    this.duration = duration; 
+    this.distance = distance;
+    this.duration = duration;
   }
   _setDescription() {
-       const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
       months[this.date.getMonth()]
     } ${this.date.getDate()}`;
@@ -30,7 +43,6 @@ class Running extends Workout {
     this._setDescription();
   }
   calcPace() {
-
     this.pace = this.duration / this.distance;
     return this.pace;
   }
@@ -44,12 +56,10 @@ class Cycling extends Workout {
     this._setDescription();
   }
   calcSpeed() {
-  
     this.speed = this.distance / (this.duration / 60);
     return this.speed;
   }
 }
-
 
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
@@ -65,11 +75,9 @@ class App {
   #mapEvent;
   #workouts = [];
   constructor() {
-   
     this._getPosition();
- e
-    this._getLocalStorage();
 
+    this._getLocalStorage();
 
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
@@ -89,20 +97,16 @@ class App {
   _loadMap(position) {
     const { latitude } = position.coords;
     const { longitude } = position.coords;
- 
 
     const coords = [latitude, longitude];
-    
 
     this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
-   
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
-  
     this.#map.on('click', this._showForm.bind(this));
 
     this.#workouts.forEach(work => {
@@ -116,7 +120,6 @@ class App {
   }
 
   _hideForm() {
-   
     inputDistance.value =
       inputDuration.value =
       inputCadence.value =
@@ -137,19 +140,17 @@ class App {
     const allPositive = (...inputs) => inputs.every(inp => inp > 0);
 
     e.preventDefault();
-  
+
     const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
     let workout;
 
- 
     if (type === 'running') {
       const cadence = +inputCadence.value;
-     
+
       if (
-    
         !validInputs(distance, duration, cadence) ||
         !allPositive(distance, duration, cadence)
       )
@@ -157,10 +158,10 @@ class App {
 
       workout = new Running([lat, lng], distance, duration, cadence);
     }
-   
+
     if (type === 'cycling') {
       const elevation = +inputElevation.value;
-     
+
       if (
         !validInputs(distance, duration, elevation) ||
         !allPositive(distance, duration)
@@ -168,18 +169,15 @@ class App {
         return alert('Input have to be positive numbers!');
       workout = new Cycling([lat, lng], distance, duration, elevation);
     }
- 
+
     this.#workouts.push(workout);
-  
+
     this._renderWorkoutMarker(workout);
 
-   
     this._renderWorkout(workout);
 
- 
     this._hideForm();
 
-  
     this._setLocalStorage();
   }
   _renderWorkoutMarker(workout) {
@@ -250,13 +248,12 @@ class App {
 
   _moveToPopup(e) {
     const workoutEl = e.target.closest('.workout');
-    
+
     if (!workoutEl) return;
 
     const workout = this.#workouts.find(
       work => work.id === workoutEl.dataset.id
     );
-   
 
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
@@ -264,14 +261,13 @@ class App {
         duration: 1,
       },
     });
-   
   }
   _setLocalStorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
-   
+
     if (!data) return;
 
     this.#workouts = data;
